@@ -46,6 +46,48 @@ def test_mutate_mobject_from_instance_method():
     assert o.a == 2
 
 
+class TestMObject(MObject):
+    def set_c(self, x):
+        self.c = x
+
+    def append_d(self, x):
+        self.d.append(x)
+
+    a = 1
+    b__c = 2
+    b__d = []
+    b__f = lambda self, x: self.c + x
+    b__set_c = set_c
+    b__append_d = append_d
+
+
+def test_class_basic_based_definition():
+    o = TestMObject()
+
+    assert o.a == 1
+    assert o.b.c == 2
+
+
+def test_class_basic_based_definition_with_mutation():
+    o = TestMObject()
+
+    o.b.set_c(3)
+    assert o.b.c == 3
+
+    o.b.append_d(4)
+    assert o.b.d == [4]
+
+    o2 = TestMObject()
+    assert o2.b.c == 2
+    assert o2.b.d == []
+
+#    assert o.a == 1
+
+
 # - Equality: The subset defined by the object graph is also available on inte the object compared to
 # - "Static" definition of mocks
 # - Python 2/3 compatibility
+# - Nice repr()
+# - Copy module in std lib?
+# - Nested attributes through nested classes
+# - Properties that start with __ and _

@@ -1,9 +1,23 @@
 from collections import defaultdict
 import functools
 from inspect import getargspec
+from copy import copy, deepcopy
+
+
+class _MObjectMeta(type):
+    def __new__(mcs, name, bases, dct):
+        dct['_mobject_attributes'] = copy(bases[0].__dict__.get('_mobject_attributes', {}))
+        if bases[0] != object:
+            for k, v in dct.items():
+                if k not in ('__module__', '_mobject_attributes'):
+                    dct['_mobject_attributes'][k] = v
+                    del dct[k]
+
+        return super(_MObjectMeta, mcs).__new__(mcs, name, bases, dct)
 
 
 class MObject(object):
+    __metaclass__ = _MObjectMeta
 
     def _handle_callable(self, c):
         def wrap(f):
@@ -39,5 +53,7 @@ class MObject(object):
             self.__dict__[k] = MObject(**v)
 
     def __init__(self, **kwargs):
-        nested = self._assign_simple_values(kwargs)
+        # Deed to take a copy here to avoid destroying the original values if mutatnig any of the fields
+        base_items = [(k, deepcopy(v)) for k, v in self.__class__.__dict__['_mobject_attributes'].items()]
+        nested = self._assign_simple_values(dict(base_items + kwargs.items()))
         self._assign_nested_values(nested)
