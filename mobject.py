@@ -2,6 +2,7 @@ from collections import defaultdict
 import functools
 from inspect import getargspec
 from copy import copy, deepcopy
+from itertools import takewhile
 
 
 class _MObjectMeta(type):
@@ -14,6 +15,10 @@ class _MObjectMeta(type):
                     del dct[k]
 
         return super(_MObjectMeta, mcs).__new__(mcs, name, bases, dct)
+
+
+def _count_underscore_prefix(s):
+    return len(list(takewhile(lambda c: c == '_', s)))
 
 
 class MObject(object):
@@ -35,13 +40,15 @@ class MObject(object):
     def _assign_simple_values(self, kw):
         nested = defaultdict(dict)
         for k, v in kw.items():
-            keys = k.split('__', 1)
+            prefix_count = _count_underscore_prefix(k)
+            keys = k[prefix_count:].split('__', 1)
+            first_key = k[:prefix_count] + keys[0]
             if len(keys) == 1:
                 if callable(v):
                     v = self._handle_callable(v)
-                self.__dict__[keys[0]] = v
+                self.__dict__[first_key] = v
             else:
-                nested[keys[0]][keys[1]] = v
+                nested[first_key][keys[1]] = v
 
         return nested
 
@@ -53,7 +60,7 @@ class MObject(object):
             self.__dict__[k] = MObject(**v)
 
     def __init__(self, **kwargs):
-        # Deed to take a copy here to avoid destroying the original values if mutatnig any of the fields
+        # Take a copy here to avoid destroying the original values if mutating any of the fields
         base_items = [(k, deepcopy(v)) for k, v in self.__class__.__dict__['_mobject_attributes'].items()]
         nested = self._assign_simple_values(dict(base_items + kwargs.items()))
         self._assign_nested_values(nested)

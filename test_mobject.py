@@ -61,14 +61,18 @@ class TestMObject(MObject):
     b__append_d = append_d
 
 
-def test_class_basic_based_definition():
-    o = TestMObject()
+class InheritedTestMObject(TestMObject):
+    foo = 3
+    a = 4
 
+
+def test_class_based_definition_base_case():
+    o = TestMObject()
     assert o.a == 1
     assert o.b.c == 2
 
 
-def test_class_basic_based_definition_with_mutation():
+def test_class_based_definition_with_mutation():
     o = TestMObject()
 
     o.b.set_c(3)
@@ -77,17 +81,45 @@ def test_class_basic_based_definition_with_mutation():
     o.b.append_d(4)
     assert o.b.d == [4]
 
+    # Overwriting the values in one object does not destroy the original
     o2 = TestMObject()
     assert o2.b.c == 2
     assert o2.b.d == []
 
+
+def test_class_based_definition_with_inheritance():
+    o = InheritedTestMObject()
+    assert o.foo == 3
+    assert o.a == 4
+    assert o.b.c == 2
+
+
+def test_class_based_definition_overridden_data():
+    o = InheritedTestMObject(a=5, b__c=6)
+    assert o.foo == 3
+    assert o.a == 5
+    assert o.b.c == 6
+    assert o.b.d == []
+
+
+def test_private_properties():
+    o = MObject(_a=1, b___c=2)
+    assert o._a == 1
+    assert o.b._c == 2
+
+
+def test_dunder_properties():
+    o = MObject(__a=1, b____c=2, b_______d=3)
+    assert o.__a == 1
+    assert o.b.__c == 2
+    assert o.b._____d == 3
+
+
 #    assert o.a == 1
 
 
-# - Equality: The subset defined by the object graph is also available on inte the object compared to
-# - "Static" definition of mocks
+# - Equality: The subset defined by the object graph is also available on in the the object compared to
+# - Multiple inheritance
 # - Python 2/3 compatibility
 # - Nice repr()
-# - Copy module in std lib?
 # - Nested attributes through nested classes
-# - Properties that start with __ and _
