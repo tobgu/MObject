@@ -7,8 +7,9 @@ from itertools import takewhile
 
 class _MObjectMeta(type):
     def __new__(mcs, name, bases, dct):
-        dct['_mobject_attributes'] = copy(bases[0].__dict__.get('_mobject_attributes', {}))
-        if bases[0] != object:
+        dct['_mobject_attributes'] = dict(sum([b.__dict__.get('_mobject_attributes', {}).items() for b in bases], []))
+        is_mobject_base_class = all(b == object for b in bases)
+        if not is_mobject_base_class:
             for k, v in dct.items():
                 if k not in ('__module__', '_mobject_attributes'):
                     dct['_mobject_attributes'][k] = v

@@ -116,22 +116,32 @@ def test_dunder_properties():
 
 
 class NestedTestMObject(MObject):
-    a = 1
+    aa = 11
 
-    class b(MObject):
-        c = 2
+    class bb(MObject):
+        cc = 22
 
 
 def test_class_based_definition_nested_classes():
     o = NestedTestMObject()
+    assert o.aa == 11
+    assert o.bb.cc == 22
+
+
+class MultiInheritedTestMObject(TestMObject, NestedTestMObject):
+    aaa = 111
+
+
+def test_class_based_definition_multiple_inheritance():
+    o = MultiInheritedTestMObject()
     assert o.a == 1
-    assert o.b.c == 2
+    assert o.aa == 11
+    assert o.aaa == 111
+
 
 #    assert o.a == 1
 
 
 # - Equality: The subset defined by the object graph is also available on in the the object compared to
-# - Multiple inheritance
 # - Python 2/3 compatibility
 # - Nice repr()
-# - Nested attributes through nested classes
