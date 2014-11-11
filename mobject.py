@@ -1,6 +1,6 @@
 from collections import defaultdict
 import functools
-from inspect import getargspec
+from inspect import getargspec, isclass
 from copy import copy, deepcopy
 from itertools import takewhile
 
@@ -44,6 +44,8 @@ class MObject(object):
             keys = k[prefix_count:].split('__', 1)
             first_key = k[:prefix_count] + keys[0]
             if len(keys) == 1:
+                if isclass(v):
+                    v = v()
                 if callable(v):
                     v = self._handle_callable(v)
                 self.__dict__[first_key] = v

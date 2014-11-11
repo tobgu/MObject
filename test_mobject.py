@@ -115,6 +115,18 @@ def test_dunder_properties():
     assert o.b._____d == 3
 
 
+class NestedTestMObject(MObject):
+    a = 1
+
+    class b(MObject):
+        c = 2
+
+
+def test_class_based_definition_nested_classes():
+    o = NestedTestMObject()
+    assert o.a == 1
+    assert o.b.c == 2
+
 #    assert o.a == 1
 
 
