@@ -1,7 +1,7 @@
 from collections import defaultdict
 import functools
 from inspect import getargspec, isclass
-from copy import copy, deepcopy
+from copy import deepcopy
 from itertools import takewhile
 
 
@@ -30,12 +30,14 @@ class MObject(object):
             @functools.wraps(f)
             def instance_fn_wrapper(*args, **kws):
                 return f(self, *args, **kws)
+
             return instance_fn_wrapper
 
         arg_names = getargspec(c).args
         if len(arg_names) > 0 and arg_names[0] == 'self':
-            return wrap(c)
+            c = wrap(c)
 
+        c._mobject_arg_names = arg_names
         return c
 
     def _assign_simple_values(self, kw):
@@ -67,3 +69,18 @@ class MObject(object):
         base_items = [(k, deepcopy(v)) for k, v in self.__class__.__dict__['_mobject_attributes'].items()]
         nested = self._assign_simple_values(dict(base_items + kwargs.items()))
         self._assign_nested_values(nested)
+
+    def _strings_for(self):
+        result = []
+        for k, v in self.__dict__.items():
+            if isinstance(v, MObject):
+                result.extend("{0}__{1}".format(k, s) for s in v._strings_for())
+            elif callable(v):
+                result.append("{0}({1})".format(k, ', '.join(v._mobject_arg_names)))
+            else:
+                result.append("{0}={1}".format(k, v))
+
+        return result
+
+    def __repr__(self):
+        return "{0}({1})".format(self.__class__.__name__, ', '.join(sorted(self._strings_for())))

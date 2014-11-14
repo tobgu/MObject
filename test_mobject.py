@@ -46,13 +46,15 @@ def test_mutate_mobject_from_instance_method():
     assert o.a == 2
 
 
+def set_c(self, x):
+    self.c = x
+
+
+def append_d(self, x):
+    self.d.append(x)
+
+
 class TestMObject(MObject):
-    def set_c(self, x):
-        self.c = x
-
-    def append_d(self, x):
-        self.d.append(x)
-
     a = 1
     b__c = 2
     b__d = []
@@ -64,6 +66,11 @@ class TestMObject(MObject):
 class InheritedTestMObject(TestMObject):
     foo = 3
     a = 4
+
+
+def test_repr():
+    o = TestMObject()
+    assert str(o) == "TestMObject(a=1, b__append_d(self, x), b__c=2, b__d=[], b__f(self, x), b__set_c(self, x))"
 
 
 def test_class_based_definition_base_case():
@@ -138,10 +145,5 @@ def test_class_based_definition_multiple_inheritance():
     assert o.aa == 11
     assert o.aaa == 111
 
-
-#    assert o.a == 1
-
-
 # - Equality: The subset defined by the object graph is also available on in the the object compared to
 # - Python 2/3 compatibility
-# - Nice repr()
