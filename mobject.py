@@ -3,6 +3,8 @@ import functools
 from inspect import getargspec, isclass
 from copy import deepcopy
 from itertools import takewhile
+from functools import total_ordering
+from operator import eq, lt
 
 
 class _MObjectMeta(type):
@@ -22,6 +24,7 @@ def _count_underscore_prefix(s):
     return len(list(takewhile(lambda c: c == '_', s)))
 
 
+@total_ordering
 class MObject(object):
     __metaclass__ = _MObjectMeta
 
@@ -84,3 +87,19 @@ class MObject(object):
 
     def __repr__(self):
         return "{0}({1})".format(self.__class__.__name__, ', '.join(sorted(self._strings_for())))
+
+    def _cmp(self, other, cmp_fn):
+        # No comparison of callables done
+        self_properties = set(k for k, v in self.__dict__.items() if not callable(v))
+        other_properties = set(k for k, v in other.__dict__.items() if not callable(v))
+
+        if not cmp_fn(self_properties, other_properties):
+            return False
+
+        return all(getattr(self, p) == getattr(other, p) for p in self_properties)
+
+    def __eq__(self, other):
+        return self._cmp(other, cmp_fn=eq)
+
+    def __lt__(self, other):
+        return self._cmp(other, cmp_fn=lt)

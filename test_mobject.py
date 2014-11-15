@@ -145,5 +145,51 @@ def test_class_based_definition_multiple_inheritance():
     assert o.aa == 11
     assert o.aaa == 111
 
-# - Equality: The subset defined by the object graph is also available on in the the object compared to
+
+class NestedRealObject(object):
+    def __init__(self):
+        self.aa = 3
+
+
+class RealObject(object):
+    def __init__(self):
+        self.a = 1
+        self.b = NestedRealObject()
+
+    def foo_fn(self):
+        return self
+
+
+def test_equality():
+    assert MObject(a=1, b__aa=3) == RealObject()
+    assert MObject(a=1, b__aa=4) != RealObject()
+    assert MObject(a=1, b__aa=3, c=2) != RealObject()
+    assert MObject(a=1) != RealObject()
+
+    # Callables are not considered for equality
+    assert MObject(a=1, b__aa=3, baz_fn=lambda self: self) == RealObject()
+
+
+def test_proper_subset():
+    assert MObject(a=1) < RealObject()
+    assert MObject(b__aa=3) < RealObject()
+    assert not MObject(a=1, b__aa=3) < RealObject()
+    assert not MObject(a=2) < RealObject()
+
+
+def test_subset():
+    assert MObject(a=1, b__aa=3) <= RealObject()
+    assert not MObject(a=1, b__aa=3, c=4) <= RealObject()
+
+
+def test_proper_superset():
+    assert MObject(a=1, b__aa=3, c=4) > RealObject()
+    assert not MObject(a=1, b__aa=3) > RealObject()
+
+
+def test_superset():
+    assert MObject(a=1, b__aa=3) >= RealObject()
+    assert not MObject(a=1) >= RealObject()
+
+
 # - Python 2/3 compatibility
