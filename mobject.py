@@ -76,7 +76,10 @@ class MObject(object):
     def _strings_for(self):
         result = []
         for k, v in self.__dict__.items():
-            if isinstance(v, MObject):
+            if '__qualname' in k:
+                # Python 3 tweak: special attribute that we do not wish to include
+                pass
+            elif isinstance(v, MObject):
                 result.extend("{0}__{1}".format(k, s) for s in v._strings_for())
             elif callable(v):
                 result.append("{0}({1})".format(k, ', '.join(v._mobject_arg_names)))
