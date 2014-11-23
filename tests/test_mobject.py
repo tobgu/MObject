@@ -134,6 +134,10 @@ def test_class_based_definition_nested_classes():
     assert o.aa == 11
     assert o.bb.cc == 22
 
+# TODO: Fix this
+#    o2 = NestedTestMObject(bb__cc=33)
+#    assert o2.bb.cc == 33
+
 
 class MultiInheritedTestMObject(TestMObject, NestedTestMObject):
     aaa = 111
@@ -190,6 +194,3 @@ def test_proper_superset():
 def test_superset():
     assert MObject(a=1, b__aa=3) >= RealObject()
     assert not MObject(a=1) >= RealObject()
-
-
-# - Python 2/3 compatibility
