@@ -43,7 +43,7 @@ class MObject(object):
         c._mobject_arg_names = arg_names
         return c
 
-    def _assign_simple_values(self, kw):
+    def _set_simple_items(self, kw):
         nested = defaultdict(dict)
         for k, v in kw.items():
             prefix_count = _count_underscore_prefix(k)
@@ -60,18 +60,24 @@ class MObject(object):
 
         return nested
 
-    def _assign_nested_values(self, nested):
+    def _set_nested_items(self, nested):
         for k, v in nested.items():
             if k in self.__dict__:
-                raise ValueError("Invalid nesting structure, '{}' is already defined as a simple value".format(k))
+                if isinstance(self.__dict__[k], MObject):
+                    self.__dict__[k]._set_items(v)
+                else:
+                    raise ValueError("Invalid nesting structure, '{}' is already defined as a simple value".format(k))
 
             self.__dict__[k] = MObject(**v)
 
     def __init__(self, **kwargs):
         # Take a copy here to avoid destroying the original values if mutating any of the fields
         base_items = [(k, deepcopy(v)) for k, v in self.__class__.__dict__['_mobject_attributes'].items()]
-        nested = self._assign_simple_values(dict(base_items + kwargs.items()))
-        self._assign_nested_values(nested)
+        self._set_items(dict(base_items + kwargs.items()))
+
+    def _set_items(self, kv):
+        nested = self._set_simple_items(kv)
+        self._set_nested_items(nested)
 
     def _strings_for(self):
         result = []

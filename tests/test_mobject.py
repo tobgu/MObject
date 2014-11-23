@@ -134,9 +134,8 @@ def test_class_based_definition_nested_classes():
     assert o.aa == 11
     assert o.bb.cc == 22
 
-# TODO: Fix this
-#    o2 = NestedTestMObject(bb__cc=33)
-#    assert o2.bb.cc == 33
+    o2 = NestedTestMObject(bb__cc=33)
+    assert o2.bb.cc == 33
 
 
 class MultiInheritedTestMObject(TestMObject, NestedTestMObject):
