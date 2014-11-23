@@ -5,3 +5,5 @@
 *.egg-info
 .tox
 tests_mobject.py
+build/
+dist/
