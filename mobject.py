@@ -4,7 +4,7 @@ from inspect import getargspec, isclass
 from copy import deepcopy
 from itertools import takewhile
 from functools import total_ordering
-from operator import eq, lt
+from operator import eq, lt, gt, le, ge
 
 
 class _MObjectMeta(type):
@@ -24,7 +24,6 @@ def _count_underscore_prefix(s):
     return len(list(takewhile(lambda c: c == '_', s)))
 
 
-@total_ordering
 class MObject(object):
     __metaclass__ = _MObjectMeta
 
@@ -43,7 +42,7 @@ class MObject(object):
         c._mobject_arg_names = arg_names
         return c
 
-    def _set_simple_items(self, kw):
+    def _set_simple_attributes(self, kw):
         nested = defaultdict(dict)
         for k, v in kw.items():
             prefix_count = _count_underscore_prefix(k)
@@ -60,11 +59,11 @@ class MObject(object):
 
         return nested
 
-    def _set_nested_items(self, nested):
+    def _set_nested_attributes(self, nested):
         for k, v in nested.items():
             if k in self.__dict__:
                 if isinstance(self.__dict__[k], MObject):
-                    self.__dict__[k]._set_items(v)
+                    self.__dict__[k]._set_attributes(v)
                 else:
                     raise ValueError("Invalid nesting structure, '{}' is already defined as a simple value".format(k))
 
@@ -73,11 +72,11 @@ class MObject(object):
     def __init__(self, **kwargs):
         # Take a copy here to avoid destroying the original values if mutating any of the fields
         base_items = [(k, deepcopy(v)) for k, v in self.__class__.__dict__['_mobject_attributes'].items()]
-        self._set_items(dict(base_items + kwargs.items()))
+        self._set_attributes(dict(base_items + kwargs.items()))
 
-    def _set_items(self, kv):
-        nested = self._set_simple_items(kv)
-        self._set_nested_items(nested)
+    def _set_attributes(self, kv):
+        nested = self._set_simple_attributes(kv)
+        self._set_nested_attributes(nested)
 
     def _strings_for(self):
         result = []
@@ -105,10 +104,22 @@ class MObject(object):
         if not cmp_fn(self_properties, other_properties):
             return False
 
-        return all(getattr(self, p) == getattr(other, p) for p in self_properties)
+        return all(getattr(self, p) == getattr(other, p) for p in (self_properties & other_properties))
 
     def __eq__(self, other):
         return self._cmp(other, cmp_fn=eq)
 
+    def __ne__(self, other):
+        return not self == other
+
     def __lt__(self, other):
         return self._cmp(other, cmp_fn=lt)
+
+    def __le__(self, other):
+        return self._cmp(other, cmp_fn=le)
+
+    def __gt__(self, other):
+        return self._cmp(other, cmp_fn=gt)
+
+    def __ge__(self, other):
+        return self._cmp(other, cmp_fn=ge)

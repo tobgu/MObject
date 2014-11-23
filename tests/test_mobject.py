@@ -187,6 +187,7 @@ def test_subset():
 
 def test_proper_superset():
     assert MObject(a=1, b__aa=3, c=4) > RealObject()
+    assert not MObject(a=2, b__aa=3, c=4) > RealObject()
     assert not MObject(a=1, b__aa=3) > RealObject()
 
 
