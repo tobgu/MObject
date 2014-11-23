@@ -123,3 +123,21 @@ True
 False
 
 ```
+
+Installation
+============
+
+pip install mobject
+
+
+Compatibility
+=============
+
+MObject has been verified to work on Python 2.7, Python 3.4 and PyPy. 
+
+
+Contributing
+============
+
+If you experience problems please log them on GitHub. If you want to contribute code, please fork
+the code and submit a pull request.
