@@ -23,7 +23,7 @@ code and submit a pull request.
 """
 
 setup(name='mobject',
-      version='0.1.0',
+      version='0.1.1',
       description='Lightweight library to construct objects and object trees',
       long_description=long_desc,
       url='http://github.com/tobgu/mobject',

@@ -1,0 +1,8 @@
+Revision history
+----------------
+
+v0.1.1, 2014-11-27
+ * Short hand 'mob' notation
+
+v0.1.0, 2014-11-23
+ * Initial version
