@@ -3,8 +3,10 @@ import functools
 from inspect import getargspec, isclass
 from copy import deepcopy
 from itertools import takewhile
-from functools import total_ordering
 from operator import eq, lt, gt, le, ge
+
+
+__all__ = ('MObject', 'mob')
 
 
 class _MObjectMeta(type):
@@ -123,3 +125,6 @@ class MObject(object):
 
     def __ge__(self, other):
         return self._cmp(other, cmp_fn=ge)
+
+
+mob = MObject

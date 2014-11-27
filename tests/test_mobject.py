@@ -1,5 +1,5 @@
 import pytest
-from mobject import MObject
+from mobject import *
 
 
 def test_simple_object_creation():
@@ -194,3 +194,7 @@ def test_proper_superset():
 def test_superset():
     assert MObject(a=1, b__aa=3) >= RealObject()
     assert not MObject(a=1) >= RealObject()
+
+
+def test_short_mob():
+    assert mob(a=1, b=2) == MObject(a=1, b=2)

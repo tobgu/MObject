@@ -1,7 +1,8 @@
 MObject
 =======
-A lightweight library to construct objects and object trees for mocking and stubbing. It is not meant
-as a replacement for mock frameworks but rather as a complement.
+M(ock)Object is a tiny library to construct objects and object trees for mocking and stubbing.
+
+It is not meant as a replacement for mock frameworks but rather as a complement.
 
 The basics, dynamic object specification
 ----------------------------------------
@@ -30,6 +31,15 @@ There's also support for easy specification of nested objects through the __ syn
 2
 >>> o
 MObject(a__b=1, a__c=2)
+
+```
+
+To save some letters there is also a short hand:
+
+```python
+>>> from mobject import *
+>>> mob(a=1) == MObject(a=1)
+True
 
 ```
 
