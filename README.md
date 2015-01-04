@@ -34,6 +34,20 @@ MObject(a__b=1, a__c=2)
 
 ```
 
+The above can also be written using a dict or any other Mapping as argument.
+
+```python
+>>> from mobject import MObject
+>>> o = MObject({'a': {'b': 1, 'c': 2}})
+>>> o.a.b
+1
+>>> o.a.c
+2
+>>> o
+MObject(a__b=1, a__c=2)
+
+```
+
 To save some letters there is also a short hand:
 
 ```python

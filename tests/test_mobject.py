@@ -17,6 +17,15 @@ def test_nested_object_creation():
     assert o.a.d.e == 3
 
 
+def test_object_creation_from_dict():
+    o = MObject({'a': {'b': 1, 'c': 2, 'd': {'e': 3}}}, {'q': 4})
+
+    assert o.a.b == 1
+    assert o.a.c == 2
+    assert o.a.d.e == 3
+    assert o.q == 4
+
+
 def test_invalid_nesting_exception():
     with pytest.raises(ValueError):
         MObject(a__b=2, a__b__c=3)

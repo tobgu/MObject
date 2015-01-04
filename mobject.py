@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, Mapping
 import functools
 from inspect import getargspec, isclass
 from copy import deepcopy
@@ -71,10 +71,25 @@ class MObject(object):
 
             self.__dict__[k] = MObject(**v)
 
-    def __init__(self, **kwargs):
+    def _mapping_to_dunder_notation(self, mapping, result, prefix=''):
+        for k, v in mapping.items():
+            new_prefix = prefix + '__' + k if prefix else k
+            if isinstance(v, Mapping):
+                self._mapping_to_dunder_notation(v, result, new_prefix)
+            else:
+                result[new_prefix] = v
+
+    def _mappings_to_dunder_notation(self, mappings):
+        result = {}
+        for m in mappings:
+            self._mapping_to_dunder_notation(m, result)
+
+        return result.items()
+
+    def __init__(self, *args, **kwargs):
         # Take a copy here to avoid destroying the original values if mutating any of the fields
         base_items = [(k, deepcopy(v)) for k, v in self.__class__.__dict__['_mobject_attributes'].items()]
-        self._set_attributes(dict(base_items + kwargs.items()))
+        self._set_attributes(dict(base_items + kwargs.items() + self._mappings_to_dunder_notation(args)))
 
     def _set_attributes(self, kv):
         nested = self._set_simple_attributes(kv)
